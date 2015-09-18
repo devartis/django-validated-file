@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django import forms
 from django.template.defaultfilters import filesizeformat
@@ -5,6 +6,7 @@ from django.utils.translation import ugettext as _
 
 import magic
 
+MAGIC_FILE_PATH = getattr(settings, 'DJANGO_VALIDATED_FILE_MAGIC_PATH', None)
 
 class ValidatedFileField(models.FileField):
     def __init__(self, *args, **kwargs):
@@ -20,7 +22,7 @@ class ValidatedFileField(models.FileField):
         if self.content_types:
             uploaded_content_type = getattr(file, 'content_type', '')
 
-            mg = magic.Magic(mime=True)
+            mg = magic.Magic(mime=True, magic_file=MAGIC_FILE_PATH)
             content_type_magic = mg.from_buffer(
                 file.read(self.mime_lookup_length)
             )
